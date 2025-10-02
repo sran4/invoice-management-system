@@ -274,7 +274,7 @@ export default function Home() {
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary mx-auto mb-4"></div>
           <p className="text-gray-600 dark:text-gray-300">Loading session...</p>
-          <p className="text-sm text-gray-500 mt-2">Debug: Status is loading</p>
+          <p className="text-sm text-gray-500 mt-2">Debug: Status is loading - Updated</p>
         </div>
       </div>
     );
