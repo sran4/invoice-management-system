@@ -1,0 +1,273 @@
+"use client";
+
+import { useState, useEffect, useRef, useMemo } from "react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Search, User, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+
+interface Customer {
+  _id: string;
+  name: string;
+  email: string;
+  phone: string;
+  companyName?: string;
+  address: {
+    street: string;
+    city: string;
+    state: string;
+    zipCode: string;
+  };
+}
+
+interface CustomerSearchProps {
+  customers: Customer[];
+  selectedCustomerId: string;
+  onCustomerSelect: (customerId: string) => void;
+  placeholder?: string;
+  className?: string;
+}
+
+export function CustomerSearch({
+  customers,
+  selectedCustomerId,
+  onCustomerSelect,
+  placeholder = "Search customers...",
+  className = "",
+}: CustomerSearchProps) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isFocused, setIsFocused] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const selectedCustomer = customers.find((c) => c._id === selectedCustomerId);
+
+  // Generate random field name to confuse Chrome autocomplete
+  const randomFieldName = useMemo(
+    () => `field-${Math.random().toString(36).substr(2, 9)}`,
+    []
+  );
+
+  // Filter customers based on search term
+  const filteredCustomers = customers.filter(
+    (customer) =>
+      customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      customer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (customer.companyName &&
+        customer.companyName.toLowerCase().includes(searchTerm.toLowerCase()))
+  );
+
+  // Close search when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
+        setIsExpanded(false);
+        setIsFocused(false);
+        setSearchTerm("");
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Aggressively disable Chrome autocomplete
+  useEffect(() => {
+    const input = inputRef.current;
+    if (input) {
+      // Set attributes that Chrome respects more
+      input.setAttribute("autocomplete", "new-password");
+      input.setAttribute("data-form-type", "other");
+      input.setAttribute("data-lpignore", "true");
+
+      // Clear autocomplete on focus
+      const handleFocus = () => {
+        input.setAttribute("autocomplete", "new-password");
+        // Force clear any existing autocomplete
+        setTimeout(() => {
+          input.setAttribute("autocomplete", "new-password");
+        }, 1);
+      };
+
+      input.addEventListener("focus", handleFocus);
+      return () => {
+        input.removeEventListener("focus", handleFocus);
+      };
+    }
+  }, []);
+
+  // Focus input when expanded
+  useEffect(() => {
+    if (isExpanded && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isExpanded]);
+
+  const handleCustomerSelect = (customerId: string) => {
+    onCustomerSelect(customerId);
+    setIsExpanded(false);
+    setIsFocused(false);
+    setSearchTerm("");
+  };
+
+  const handleClearSelection = () => {
+    onCustomerSelect("");
+    setSearchTerm("");
+  };
+
+  const handleMouseEnter = () => {
+    if (!isFocused) {
+      setIsExpanded(true);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (!isFocused) {
+      setIsExpanded(false);
+    }
+  };
+
+  return (
+    <div
+      ref={containerRef}
+      className={`relative ${className}`}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      {/* Main Input/Display */}
+      <div className="relative">
+        {selectedCustomer ? (
+          // Show selected customer
+          <div className="flex items-center justify-between p-3 border border-slate-600 rounded-lg bg-slate-800 hover:border-slate-500 transition-colors">
+            <div className="flex items-center space-x-3">
+              <User className="h-5 w-5 text-slate-300" />
+              <div>
+                <p className="font-medium text-white">
+                  {selectedCustomer.name}
+                </p>
+                {selectedCustomer.companyName && (
+                  <p className="text-sm text-slate-400">
+                    {selectedCustomer.companyName}
+                  </p>
+                )}
+                <p className="text-sm text-slate-300">
+                  {selectedCustomer.email}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={handleClearSelection}
+                className="h-8 w-8 p-0 hover:bg-slate-700 text-slate-300 hover:text-white"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+              <Search className="h-4 w-4 text-slate-300" />
+            </div>
+          </div>
+        ) : (
+          // Show search input
+          <form autoComplete="off" style={{ display: "contents" }}>
+            <div className="relative">
+              {/* Hidden input to trick Chrome autocomplete */}
+              <input
+                type="text"
+                style={{ display: "none" }}
+                autoComplete="username"
+                tabIndex={-1}
+              />
+              <Input
+                ref={inputRef}
+                type="text"
+                placeholder={placeholder}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onFocus={() => {
+                  setIsFocused(true);
+                  setIsExpanded(true);
+                }}
+                onBlur={() => {
+                  setIsFocused(false);
+                  // Don't close immediately, let the click outside handler handle it
+                }}
+                autoComplete="new-password"
+                autoCorrect="off"
+                autoCapitalize="off"
+                spellCheck="false"
+                name={randomFieldName}
+                id={randomFieldName}
+                className="pr-10 bg-slate-800 border-slate-600 text-white placeholder:text-slate-400 focus:border-slate-500 focus:ring-slate-500"
+              />
+              <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-300" />
+            </div>
+          </form>
+        )}
+      </div>
+
+      {/* Dropdown Results - Push Down Approach */}
+      <AnimatePresence>
+        {isExpanded && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
+            className="mt-2 bg-slate-900 border border-slate-600 rounded-lg shadow-xl max-h-60 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-500 scrollbar-track-slate-800 hover:scrollbar-thumb-slate-400 animate-in slide-in-from-top-2 duration-200 dropdown-scroll"
+          >
+            {filteredCustomers.length > 0 ? (
+              <div className="py-1">
+                {filteredCustomers.map((customer) => (
+                  <motion.button
+                    key={customer._id}
+                    type="button"
+                    onClick={() => handleCustomerSelect(customer._id)}
+                    className="w-full px-4 py-3 text-left hover:bg-slate-700 focus:bg-slate-700 focus:outline-none transition-colors border-b border-slate-700/50 last:border-b-0"
+                    whileHover={{ backgroundColor: "#374151" }}
+                    whileTap={{ backgroundColor: "#4b5563" }}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <User className="h-4 w-4 text-slate-300 flex-shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-white truncate">
+                          {customer.name}
+                        </p>
+                        {customer.companyName && (
+                          <p className="text-sm text-slate-400 truncate">
+                            {customer.companyName}
+                          </p>
+                        )}
+                        <p className="text-sm text-slate-300 truncate">
+                          {customer.email}
+                        </p>
+                        {customer.phone && (
+                          <p className="text-xs text-slate-400 truncate">
+                            {customer.phone}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </motion.button>
+                ))}
+              </div>
+            ) : (
+              <div className="px-4 py-3 text-center">
+                <p className="text-white">
+                  {searchTerm
+                    ? "No customers found"
+                    : "Start typing to search customers..."}
+                </p>
+              </div>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
