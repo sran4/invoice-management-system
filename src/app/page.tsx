@@ -40,6 +40,10 @@ import { Accordion } from "@/components/ui/accordion";
 export default function Home() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  
+  // Debug logging
+  console.log("Home page - Session status:", status);
+  console.log("Home page - Session data:", session);
   const [previewTemplate, setPreviewTemplate] = useState<{
     id: string;
     name: string;
@@ -48,12 +52,13 @@ export default function Home() {
     iconColor: string;
   } | null>(null);
 
-  useEffect(() => {
-    if (status === "loading") return;
-    if (session) {
-      router.push("/dashboard");
-    }
-  }, [session, status, router]);
+  // Temporarily disabled auto-redirect to debug login issue
+  // useEffect(() => {
+  //   if (status === "loading") return;
+  //   if (session) {
+  //     router.push("/dashboard");
+  //   }
+  // }, [session, status, router]);
 
   const handlePreviewTemplate = (template: {
     id: string;
