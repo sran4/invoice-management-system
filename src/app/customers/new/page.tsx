@@ -62,7 +62,10 @@ export default function NewCustomerPage() {
       setFormData((prev) => ({
         ...prev,
         [parent]: {
-          ...prev[parent as keyof CustomerFormData],
+          ...(prev[parent as keyof CustomerFormData] as Record<
+            string,
+            unknown
+          >),
           [child]: value,
         },
       }));
@@ -147,7 +150,7 @@ export default function NewCustomerPage() {
                   Basic Information
                 </CardTitle>
                 <CardDescription>
-                  Customer's personal and contact details
+                  Customer&apos;s personal and contact details
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -218,7 +221,7 @@ export default function NewCustomerPage() {
               <CardHeader>
                 <CardTitle>Address Information</CardTitle>
                 <CardDescription>
-                  Customer's billing and shipping address
+                  Customer&apos;s billing and shipping address
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">

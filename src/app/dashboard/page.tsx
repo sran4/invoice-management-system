@@ -4,7 +4,6 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
 import {
-  Card,
   CardContent,
   CardDescription,
   CardHeader,
@@ -235,7 +234,7 @@ export default function Dashboard() {
       name: customer.name,
       city: customer.address.city,
       phone: customer.phone || "No Phone",
-      companyName: customer.companyName || "",
+      companyName: (customer as { companyName?: string }).companyName || "",
     };
   };
 

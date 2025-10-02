@@ -35,7 +35,9 @@ export const authOptions: NextAuthOptions = {
               },
             },
           };
-          const rateLimitResult = loginRateLimit(mockReq as any);
+          const rateLimitResult = loginRateLimit(
+            mockReq as unknown as Parameters<typeof loginRateLimit>[0]
+          );
           if (!rateLimitResult.success) {
             console.log("Rate limit exceeded, but allowing for testing");
             // throw new Error(`Too many login attempts. Try again in ${Math.ceil((rateLimitResult.resetTime - Date.now()) / 60000)} minutes.`);
@@ -159,13 +161,14 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user, account }) {
       if (user) {
         token.id = user.id;
-        token.refreshToken = (user as any).refreshToken;
+        token.refreshToken = (user as { refreshToken?: string }).refreshToken;
 
-        if ((user as any).refreshToken) {
+        if ((user as { refreshToken?: string }).refreshToken) {
           console.log("🔑 JWT: Refresh token stored in JWT token");
           console.log(
             "🔑 JWT: Refresh token (first 10 chars):",
-            (user as any).refreshToken.substring(0, 10) + "..."
+            (user as { refreshToken?: string }).refreshToken?.substring(0, 10) +
+              "..."
           );
         } else {
           console.log("🔑 JWT: No refresh token provided");
@@ -173,7 +176,11 @@ export const authOptions: NextAuthOptions = {
       }
 
       // Check if token is expired and we have a refresh token
-      if (token.refreshToken && token.exp && Date.now() > token.exp * 1000) {
+      if (
+        token.refreshToken &&
+        token.exp &&
+        Date.now() > (token.exp as number) * 1000
+      ) {
         console.log("🔄 JWT: Token expired, attempting to refresh...");
 
         try {
@@ -183,7 +190,7 @@ export const authOptions: NextAuthOptions = {
           if (dbUser) {
             // Find the refresh token in the database
             const refreshTokenData = dbUser.refreshTokens.find(
-              (rt: any) =>
+              (rt: { token: string; expiresAt: Date }) =>
                 rt.token === token.refreshToken && rt.expiresAt > new Date()
             );
 
@@ -200,12 +207,12 @@ export const authOptions: NextAuthOptions = {
               console.log("❌ JWT: Refresh token expired or not found");
               // Remove invalid refresh token
               await dbUser.removeRefreshToken(token.refreshToken);
-              return null; // This will force a re-login
+              return token; // Return current token, will be invalidated
             }
           }
         } catch (error) {
           console.error("❌ JWT: Error during token refresh:", error);
-          return null; // This will force a re-login
+          return token; // Return current token, will be invalidated
         }
       }
 
@@ -240,12 +247,12 @@ export const authOptions: NextAuthOptions = {
       return token;
     },
     async session({ session, token }) {
-      if (token) {
-        session.user.id = token.id as string;
+      if (token && session.user) {
+        (session.user as { id?: string }).id = token.id as string;
       }
       return session;
     },
-    async signIn({ user, account, profile }) {
+    async signIn({ account }) {
       // Allow Google OAuth
       if (account?.provider === "google") {
         return true;
@@ -257,10 +264,9 @@ export const authOptions: NextAuthOptions = {
   },
   pages: {
     signIn: "/auth/signin",
-    signUp: "/auth/signup",
   },
   events: {
-    async signIn({ user, account, profile, isNewUser }) {
+    async signIn({ user, account }) {
       if (account?.provider === "credentials") {
         try {
           await connectDB();

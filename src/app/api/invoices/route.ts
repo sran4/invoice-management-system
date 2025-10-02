@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
     await connectDB();
 
     // Build query
-    const query: any = { userId: session.user.email };
+    const query: Record<string, unknown> = { userId: session.user.email };
 
     // Add search functionality if search term is provided
     if (search) {
@@ -98,10 +98,12 @@ export async function GET(request: NextRequest) {
     response.headers.set("X-Content-Type-Options", "nosniff");
 
     return response;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching invoices:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json(
-      { error: "Failed to fetch invoices", details: error.message },
+      { error: "Failed to fetch invoices", details: errorMessage },
       { status: 500 }
     );
   }
@@ -197,10 +199,12 @@ export async function POST(request: NextRequest) {
       },
       { status: 201 }
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error creating invoice:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json(
-      { error: "Failed to create invoice", details: error.message },
+      { error: "Failed to create invoice", details: errorMessage },
       { status: 500 }
     );
   }

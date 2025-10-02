@@ -4,7 +4,6 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
-  Card,
   CardContent,
   CardDescription,
   CardHeader,
@@ -24,7 +23,6 @@ import {
 } from "@/components/ui/dialog";
 import {
   FileText,
-  Palette,
   Eye,
   Check,
   Sparkles,
@@ -41,7 +39,7 @@ interface Template {
   category: "modern" | "classic" | "minimal" | "professional" | "creative";
   preview: string;
   features: string[];
-  icon: any;
+  icon: React.ComponentType<{ className?: string }>;
   gradient: string;
   popular?: boolean;
 }

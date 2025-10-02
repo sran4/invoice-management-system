@@ -4,7 +4,6 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
-  Card,
   CardContent,
   CardDescription,
   CardHeader,
@@ -26,17 +25,10 @@ import {
   Calendar,
   DollarSign,
   User,
-  ChevronDown,
   Phone,
   ChevronLeft,
   ChevronRight,
   AlertTriangle,
-  ExternalLink,
-  Pencil,
-  ArrowDownToLine,
-  EyeIcon,
-  PenTool,
-  Trash,
 } from "lucide-react";
 import {
   generateInvoicePDF,
@@ -51,7 +43,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { GradientTooltip } from "@/components/ui/gradient-tooltip";
 
 interface Invoice {
@@ -120,7 +112,7 @@ export default function InvoicesPage() {
     ]).catch((error) => {
       console.error("Error fetching initial data:", error);
     });
-  }, [session, status, router]);
+  }, [session, status, router, searchTerm, statusFilter]);
 
   // Handle search with debouncing
   useEffect(() => {
@@ -131,13 +123,13 @@ export default function InvoicesPage() {
     }, 500);
 
     return () => clearTimeout(timeoutId);
-  }, [searchTerm]);
+  }, [searchTerm, statusFilter]);
 
   // Handle status filter changes
   useEffect(() => {
     if (status === "loading" || !session) return;
     fetchInvoices(1, searchTerm, statusFilter);
-  }, [statusFilter]);
+  }, [statusFilter, session, status]);
 
   useEffect(() => {
     if (invoicesLoaded && customersLoaded) {

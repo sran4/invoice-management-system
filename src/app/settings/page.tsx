@@ -1,40 +1,39 @@
-'use client';
+"use client";
 
-import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Switch } from '@/components/ui/switch';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { AnimatedCard } from '@/components/ui/animated-card';
-import { motion } from 'framer-motion';
-import { useTheme } from '@/contexts/ThemeContext';
-import { 
-  Settings, 
-  User, 
-  Building, 
-  Palette, 
-  Bell, 
-  Shield, 
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import {
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { AnimatedCard } from "@/components/ui/animated-card";
+import { motion } from "framer-motion";
+import { useTheme } from "@/contexts/ThemeContext";
+import {
+  Settings,
+  Building,
+  Palette,
+  Bell,
+  Shield,
   Save,
   Upload,
   Download,
-  Trash2,
-  Eye,
-  EyeOff,
-  Globe,
-  Mail,
-  Phone,
-  MapPin,
-  FileText,
-  CreditCard
-} from 'lucide-react';
-import { toast } from 'sonner';
+} from "lucide-react";
+import { toast } from "sonner";
 
 interface CompanySettings {
   name: string;
@@ -53,7 +52,7 @@ interface CompanySettings {
 }
 
 interface UserPreferences {
-  theme: 'light' | 'dark' | 'auto';
+  theme: "light" | "dark" | "auto";
   notifications: {
     email: boolean;
     browser: boolean;
@@ -74,43 +73,45 @@ export default function SettingsPage() {
   const { theme, setTheme } = useTheme();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [activeTab, setActiveTab] = useState('company');
-  
+  const [activeTab, setActiveTab] = useState("company");
+
   const [companySettings, setCompanySettings] = useState<CompanySettings>({
-    name: '',
-    email: '',
-    phone: '',
-    website: '',
+    name: "",
+    email: "",
+    phone: "",
+    website: "",
     address: {
-      street: '',
-      city: '',
-      state: '',
-      zipCode: '',
-      country: 'USA'
+      street: "",
+      city: "",
+      state: "",
+      zipCode: "",
+      country: "USA",
     },
-    taxId: '',
-    logo: ''
+    taxId: "",
+    logo: "",
   });
 
-  const [userPreferences, setUserPreferences] = useState<Omit<UserPreferences, 'theme'>>({
+  const [userPreferences, setUserPreferences] = useState<
+    Omit<UserPreferences, "theme">
+  >({
     notifications: {
       email: true,
       browser: true,
       invoiceReminders: true,
-      paymentReminders: true
+      paymentReminders: true,
     },
     invoiceDefaults: {
       dueDays: 30,
       taxRate: 8.25,
-      currency: 'USD',
-      template: 'modern'
-    }
+      currency: "USD",
+      template: "modern",
+    },
   });
 
   useEffect(() => {
-    if (status === 'loading') return;
+    if (status === "loading") return;
     if (!session) {
-      router.push('/auth/signin');
+      router.push("/auth/signin");
       return;
     }
     loadSettings();
@@ -123,40 +124,40 @@ export default function SettingsPage() {
         return;
       }
 
-      const response = await fetch('/api/settings');
+      const response = await fetch("/api/settings");
       const data = await response.json();
-      
+
       if (data.success) {
         if (data.companySettings) {
           setCompanySettings(data.companySettings);
         } else {
           // Set default values if no company settings exist
           setCompanySettings({
-            name: '',
+            name: "",
             email: session.user.email,
-            phone: '',
-            website: '',
+            phone: "",
+            website: "",
             address: {
-              street: '',
-              city: '',
-              state: '',
-              zipCode: '',
-              country: 'USA'
+              street: "",
+              city: "",
+              state: "",
+              zipCode: "",
+              country: "USA",
             },
-            taxId: '',
-            logo: ''
+            taxId: "",
+            logo: "",
           });
         }
-        
+
         if (data.preferences) {
           setUserPreferences(data.preferences);
         }
       } else {
-        toast.error('Failed to load settings');
+        toast.error("Failed to load settings");
       }
     } catch (error) {
-      console.error('Error loading settings:', error);
-      toast.error('Failed to load settings');
+      console.error("Error loading settings:", error);
+      toast.error("Failed to load settings");
     } finally {
       setLoading(false);
     }
@@ -165,10 +166,10 @@ export default function SettingsPage() {
   const handleSaveSettings = async () => {
     setSaving(true);
     try {
-      const response = await fetch('/api/settings', {
-        method: 'PUT',
+      const response = await fetch("/api/settings", {
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           companySettings,
@@ -177,15 +178,15 @@ export default function SettingsPage() {
       });
 
       const data = await response.json();
-      
+
       if (data.success) {
-        toast.success('Settings saved successfully!');
+        toast.success("Settings saved successfully!");
       } else {
-        toast.error(data.error || 'Failed to save settings');
+        toast.error(data.error || "Failed to save settings");
       }
     } catch (error) {
-      console.error('Error saving settings:', error);
-      toast.error('Failed to save settings');
+      console.error("Error saving settings:", error);
+      toast.error("Failed to save settings");
     } finally {
       setSaving(false);
     }
@@ -197,16 +198,16 @@ export default function SettingsPage() {
       // In a real app, you'd upload to your server
       const reader = new FileReader();
       reader.onload = (e) => {
-        setCompanySettings(prev => ({
+        setCompanySettings((prev) => ({
           ...prev,
-          logo: e.target?.result as string
+          logo: e.target?.result as string,
         }));
       };
       reader.readAsDataURL(file);
     }
   };
 
-  if (status === 'loading' || loading) {
+  if (status === "loading" || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
@@ -219,23 +220,25 @@ export default function SettingsPage() {
   }
 
   const tabs = [
-    { id: 'company', name: 'Company', icon: Building },
-    { id: 'preferences', name: 'Preferences', icon: Settings },
-    { id: 'notifications', name: 'Notifications', icon: Bell },
-    { id: 'security', name: 'Security', icon: Shield },
+    { id: "company", name: "Company", icon: Building },
+    { id: "preferences", name: "Preferences", icon: Settings },
+    { id: "notifications", name: "Notifications", icon: Bell },
+    { id: "security", name: "Security", icon: Shield },
   ];
 
   return (
     <div className="pt-20 p-6 min-h-screen">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <motion.div 
+        <motion.div
           className="mb-8"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <h1 className="text-4xl font-bold gradient-text mb-2 float-animation">Settings</h1>
+          <h1 className="text-4xl font-bold gradient-text mb-2 float-animation">
+            Settings
+          </h1>
           <p className="text-slate-300 text-lg">
             Manage your account settings and preferences
           </p>
@@ -261,8 +264,8 @@ export default function SettingsPage() {
                       onClick={() => setActiveTab(tab.id)}
                       className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 ${
                         activeTab === tab.id
-                          ? 'bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700'
-                          : 'hover:bg-slate-100 text-slate-300'
+                          ? "bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700"
+                          : "hover:bg-slate-100 text-slate-300"
                       }`}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
@@ -270,14 +273,21 @@ export default function SettingsPage() {
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 0.2 + index * 0.1 }}
                     >
-                      <Icon className={`h-5 w-5 ${
-                        activeTab === tab.id 
-                          ? tab.id === 'company' ? 'text-blue-500' :
-                            tab.id === 'preferences' ? 'text-purple-500' :
-                            tab.id === 'notifications' ? 'text-orange-500' :
-                            tab.id === 'security' ? 'text-green-500' : 'text-blue-500'
-                          : 'text-slate-400'
-                      }`} />
+                      <Icon
+                        className={`h-5 w-5 ${
+                          activeTab === tab.id
+                            ? tab.id === "company"
+                              ? "text-blue-500"
+                              : tab.id === "preferences"
+                              ? "text-purple-500"
+                              : tab.id === "notifications"
+                              ? "text-orange-500"
+                              : tab.id === "security"
+                              ? "text-green-500"
+                              : "text-blue-500"
+                            : "text-slate-400"
+                        }`}
+                      />
                       <span className="font-medium">{tab.name}</span>
                     </motion.button>
                   );
@@ -293,7 +303,7 @@ export default function SettingsPage() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
-              {activeTab === 'company' && (
+              {activeTab === "company" && (
                 <AnimatedCard delay={0.3} className="gradient-card">
                   <CardHeader>
                     <CardTitle className="flex items-center text-blue-400">
@@ -311,7 +321,11 @@ export default function SettingsPage() {
                       <div className="flex items-center space-x-4">
                         <div className="w-20 h-20 bg-gradient-to-br from-red-100 to-blue-100 rounded-lg flex items-center justify-center">
                           {companySettings.logo ? (
-                            <img src={companySettings.logo} alt="Logo" className="w-full h-full object-cover rounded-lg" />
+                            <img
+                              src={companySettings.logo}
+                              alt="Logo"
+                              className="w-full h-full object-cover rounded-lg"
+                            />
                           ) : (
                             <Building className="h-8 w-8 text-red-500" />
                           )}
@@ -324,10 +338,15 @@ export default function SettingsPage() {
                             className="hidden"
                             id="logo-upload"
                           />
-                          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                          <motion.div
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                          >
                             <Button
                               variant="outline"
-                              onClick={() => document.getElementById('logo-upload')?.click()}
+                              onClick={() =>
+                                document.getElementById("logo-upload")?.click()
+                              }
                               className="border-red-300 text-red-600 hover:bg-red-50"
                             >
                               <Upload className="h-4 w-4 mr-2" />
@@ -345,7 +364,12 @@ export default function SettingsPage() {
                         <Input
                           id="company-name"
                           value={companySettings.name}
-                          onChange={(e) => setCompanySettings(prev => ({ ...prev, name: e.target.value }))}
+                          onChange={(e) =>
+                            setCompanySettings((prev) => ({
+                              ...prev,
+                              name: e.target.value,
+                            }))
+                          }
                           className="border-red-200 focus:border-red-400 focus:ring-red-200"
                         />
                       </div>
@@ -367,7 +391,12 @@ export default function SettingsPage() {
                         <Input
                           id="company-phone"
                           value={companySettings.phone}
-                          onChange={(e) => setCompanySettings(prev => ({ ...prev, phone: e.target.value }))}
+                          onChange={(e) =>
+                            setCompanySettings((prev) => ({
+                              ...prev,
+                              phone: e.target.value,
+                            }))
+                          }
                           className="border-red-200 focus:border-red-400 focus:ring-red-200"
                         />
                       </div>
@@ -376,7 +405,12 @@ export default function SettingsPage() {
                         <Input
                           id="company-website"
                           value={companySettings.website}
-                          onChange={(e) => setCompanySettings(prev => ({ ...prev, website: e.target.value }))}
+                          onChange={(e) =>
+                            setCompanySettings((prev) => ({
+                              ...prev,
+                              website: e.target.value,
+                            }))
+                          }
                           className="border-red-200 focus:border-red-400 focus:ring-red-200"
                         />
                       </div>
@@ -391,10 +425,15 @@ export default function SettingsPage() {
                           <Input
                             id="street"
                             value={companySettings.address.street}
-                            onChange={(e) => setCompanySettings(prev => ({
-                              ...prev,
-                              address: { ...prev.address, street: e.target.value }
-                            }))}
+                            onChange={(e) =>
+                              setCompanySettings((prev) => ({
+                                ...prev,
+                                address: {
+                                  ...prev.address,
+                                  street: e.target.value,
+                                },
+                              }))
+                            }
                             className="border-red-200 focus:border-red-400 focus:ring-red-200"
                           />
                         </div>
@@ -403,10 +442,15 @@ export default function SettingsPage() {
                           <Input
                             id="city"
                             value={companySettings.address.city}
-                            onChange={(e) => setCompanySettings(prev => ({
-                              ...prev,
-                              address: { ...prev.address, city: e.target.value }
-                            }))}
+                            onChange={(e) =>
+                              setCompanySettings((prev) => ({
+                                ...prev,
+                                address: {
+                                  ...prev.address,
+                                  city: e.target.value,
+                                },
+                              }))
+                            }
                             className="border-red-200 focus:border-red-400 focus:ring-red-200"
                           />
                         </div>
@@ -415,10 +459,15 @@ export default function SettingsPage() {
                           <Input
                             id="state"
                             value={companySettings.address.state}
-                            onChange={(e) => setCompanySettings(prev => ({
-                              ...prev,
-                              address: { ...prev.address, state: e.target.value }
-                            }))}
+                            onChange={(e) =>
+                              setCompanySettings((prev) => ({
+                                ...prev,
+                                address: {
+                                  ...prev.address,
+                                  state: e.target.value,
+                                },
+                              }))
+                            }
                             className="border-red-200 focus:border-red-400 focus:ring-red-200"
                           />
                         </div>
@@ -427,10 +476,15 @@ export default function SettingsPage() {
                           <Input
                             id="zipCode"
                             value={companySettings.address.zipCode}
-                            onChange={(e) => setCompanySettings(prev => ({
-                              ...prev,
-                              address: { ...prev.address, zipCode: e.target.value }
-                            }))}
+                            onChange={(e) =>
+                              setCompanySettings((prev) => ({
+                                ...prev,
+                                address: {
+                                  ...prev.address,
+                                  zipCode: e.target.value,
+                                },
+                              }))
+                            }
                             className="border-red-200 focus:border-red-400 focus:ring-red-200"
                           />
                         </div>
@@ -439,10 +493,15 @@ export default function SettingsPage() {
                           <Input
                             id="country"
                             value={companySettings.address.country}
-                            onChange={(e) => setCompanySettings(prev => ({
-                              ...prev,
-                              address: { ...prev.address, country: e.target.value }
-                            }))}
+                            onChange={(e) =>
+                              setCompanySettings((prev) => ({
+                                ...prev,
+                                address: {
+                                  ...prev.address,
+                                  country: e.target.value,
+                                },
+                              }))
+                            }
                             className="border-red-200 focus:border-red-400 focus:ring-red-200"
                           />
                         </div>
@@ -455,7 +514,12 @@ export default function SettingsPage() {
                       <Input
                         id="tax-id"
                         value={companySettings.taxId}
-                        onChange={(e) => setCompanySettings(prev => ({ ...prev, taxId: e.target.value }))}
+                        onChange={(e) =>
+                          setCompanySettings((prev) => ({
+                            ...prev,
+                            taxId: e.target.value,
+                          }))
+                        }
                         className="border-red-200 focus:border-red-400 focus:ring-red-200"
                       />
                     </div>
@@ -463,7 +527,7 @@ export default function SettingsPage() {
                 </AnimatedCard>
               )}
 
-              {activeTab === 'preferences' && (
+              {activeTab === "preferences" && (
                 <AnimatedCard delay={0.3} className="gradient-card">
                   <CardHeader>
                     <CardTitle className="flex items-center text-purple-400">
@@ -480,7 +544,9 @@ export default function SettingsPage() {
                       <Label>Theme</Label>
                       <Select
                         value={theme}
-                        onValueChange={(value) => setTheme(value as 'light' | 'dark' | 'auto')}
+                        onValueChange={(value) =>
+                          setTheme(value as "light" | "dark" | "auto")
+                        }
                       >
                         <SelectTrigger className="border-red-200 focus:border-red-400 focus:ring-red-200">
                           <SelectValue />
@@ -495,7 +561,9 @@ export default function SettingsPage() {
 
                     {/* Invoice Defaults */}
                     <div className="space-y-4">
-                      <Label className="text-lg font-medium">Invoice Defaults</Label>
+                      <Label className="text-lg font-medium">
+                        Invoice Defaults
+                      </Label>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
                           <Label htmlFor="due-days">Default Due Days</Label>
@@ -503,10 +571,15 @@ export default function SettingsPage() {
                             id="due-days"
                             type="number"
                             value={userPreferences.invoiceDefaults.dueDays}
-                            onChange={(e) => setUserPreferences(prev => ({
-                              ...prev,
-                              invoiceDefaults: { ...prev.invoiceDefaults, dueDays: parseInt(e.target.value) }
-                            }))}
+                            onChange={(e) =>
+                              setUserPreferences((prev) => ({
+                                ...prev,
+                                invoiceDefaults: {
+                                  ...prev.invoiceDefaults,
+                                  dueDays: parseInt(e.target.value),
+                                },
+                              }))
+                            }
                             className="border-red-200 focus:border-red-400 focus:ring-red-200"
                           />
                         </div>
@@ -517,10 +590,15 @@ export default function SettingsPage() {
                             type="number"
                             step="0.01"
                             value={userPreferences.invoiceDefaults.taxRate}
-                            onChange={(e) => setUserPreferences(prev => ({
-                              ...prev,
-                              invoiceDefaults: { ...prev.invoiceDefaults, taxRate: parseFloat(e.target.value) }
-                            }))}
+                            onChange={(e) =>
+                              setUserPreferences((prev) => ({
+                                ...prev,
+                                invoiceDefaults: {
+                                  ...prev.invoiceDefaults,
+                                  taxRate: parseFloat(e.target.value),
+                                },
+                              }))
+                            }
                             className="border-red-200 focus:border-red-400 focus:ring-red-200"
                           />
                         </div>
@@ -528,10 +606,15 @@ export default function SettingsPage() {
                           <Label htmlFor="currency">Currency</Label>
                           <Select
                             value={userPreferences.invoiceDefaults.currency}
-                            onValueChange={(value) => setUserPreferences(prev => ({
-                              ...prev,
-                              invoiceDefaults: { ...prev.invoiceDefaults, currency: value }
-                            }))}
+                            onValueChange={(value) =>
+                              setUserPreferences((prev) => ({
+                                ...prev,
+                                invoiceDefaults: {
+                                  ...prev.invoiceDefaults,
+                                  currency: value,
+                                },
+                              }))
+                            }
                           >
                             <SelectTrigger className="border-red-200 focus:border-red-400 focus:ring-red-200">
                               <SelectValue />
@@ -548,10 +631,15 @@ export default function SettingsPage() {
                           <Label htmlFor="template">Default Template</Label>
                           <Select
                             value={userPreferences.invoiceDefaults.template}
-                            onValueChange={(value) => setUserPreferences(prev => ({
-                              ...prev,
-                              invoiceDefaults: { ...prev.invoiceDefaults, template: value }
-                            }))}
+                            onValueChange={(value) =>
+                              setUserPreferences((prev) => ({
+                                ...prev,
+                                invoiceDefaults: {
+                                  ...prev.invoiceDefaults,
+                                  template: value,
+                                },
+                              }))
+                            }
                           >
                             <SelectTrigger className="border-red-200 focus:border-red-400 focus:ring-red-200">
                               <SelectValue />
@@ -560,7 +648,9 @@ export default function SettingsPage() {
                               <SelectItem value="modern">Modern</SelectItem>
                               <SelectItem value="classic">Classic</SelectItem>
                               <SelectItem value="minimal">Minimal</SelectItem>
-                              <SelectItem value="professional">Professional</SelectItem>
+                              <SelectItem value="professional">
+                                Professional
+                              </SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
@@ -570,7 +660,7 @@ export default function SettingsPage() {
                 </AnimatedCard>
               )}
 
-              {activeTab === 'notifications' && (
+              {activeTab === "notifications" && (
                 <AnimatedCard delay={0.3} className="gradient-card">
                   <CardHeader>
                     <CardTitle className="flex items-center text-orange-400">
@@ -585,54 +675,94 @@ export default function SettingsPage() {
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
                         <div>
-                          <Label className="text-base font-medium">Email Notifications</Label>
-                          <p className="text-sm text-slate-300">Receive notifications via email</p>
+                          <Label className="text-base font-medium">
+                            Email Notifications
+                          </Label>
+                          <p className="text-sm text-slate-300">
+                            Receive notifications via email
+                          </p>
                         </div>
                         <Switch
                           checked={userPreferences.notifications.email}
-                          onCheckedChange={(checked) => setUserPreferences(prev => ({
-                            ...prev,
-                            notifications: { ...prev.notifications, email: checked }
-                          }))}
+                          onCheckedChange={(checked) =>
+                            setUserPreferences((prev) => ({
+                              ...prev,
+                              notifications: {
+                                ...prev.notifications,
+                                email: checked,
+                              },
+                            }))
+                          }
                         />
                       </div>
                       <div className="flex items-center justify-between">
                         <div>
-                          <Label className="text-base font-medium">Browser Notifications</Label>
-                          <p className="text-sm text-slate-300">Show browser notifications</p>
+                          <Label className="text-base font-medium">
+                            Browser Notifications
+                          </Label>
+                          <p className="text-sm text-slate-300">
+                            Show browser notifications
+                          </p>
                         </div>
                         <Switch
                           checked={userPreferences.notifications.browser}
-                          onCheckedChange={(checked) => setUserPreferences(prev => ({
-                            ...prev,
-                            notifications: { ...prev.notifications, browser: checked }
-                          }))}
+                          onCheckedChange={(checked) =>
+                            setUserPreferences((prev) => ({
+                              ...prev,
+                              notifications: {
+                                ...prev.notifications,
+                                browser: checked,
+                              },
+                            }))
+                          }
                         />
                       </div>
                       <div className="flex items-center justify-between">
                         <div>
-                          <Label className="text-base font-medium">Invoice Reminders</Label>
-                          <p className="text-sm text-slate-300">Remind about upcoming due dates</p>
+                          <Label className="text-base font-medium">
+                            Invoice Reminders
+                          </Label>
+                          <p className="text-sm text-slate-300">
+                            Remind about upcoming due dates
+                          </p>
                         </div>
                         <Switch
-                          checked={userPreferences.notifications.invoiceReminders}
-                          onCheckedChange={(checked) => setUserPreferences(prev => ({
-                            ...prev,
-                            notifications: { ...prev.notifications, invoiceReminders: checked }
-                          }))}
+                          checked={
+                            userPreferences.notifications.invoiceReminders
+                          }
+                          onCheckedChange={(checked) =>
+                            setUserPreferences((prev) => ({
+                              ...prev,
+                              notifications: {
+                                ...prev.notifications,
+                                invoiceReminders: checked,
+                              },
+                            }))
+                          }
                         />
                       </div>
                       <div className="flex items-center justify-between">
                         <div>
-                          <Label className="text-base font-medium">Payment Reminders</Label>
-                          <p className="text-sm text-slate-300">Remind about overdue payments</p>
+                          <Label className="text-base font-medium">
+                            Payment Reminders
+                          </Label>
+                          <p className="text-sm text-slate-300">
+                            Remind about overdue payments
+                          </p>
                         </div>
                         <Switch
-                          checked={userPreferences.notifications.paymentReminders}
-                          onCheckedChange={(checked) => setUserPreferences(prev => ({
-                            ...prev,
-                            notifications: { ...prev.notifications, paymentReminders: checked }
-                          }))}
+                          checked={
+                            userPreferences.notifications.paymentReminders
+                          }
+                          onCheckedChange={(checked) =>
+                            setUserPreferences((prev) => ({
+                              ...prev,
+                              notifications: {
+                                ...prev.notifications,
+                                paymentReminders: checked,
+                              },
+                            }))
+                          }
                         />
                       </div>
                     </div>
@@ -640,7 +770,7 @@ export default function SettingsPage() {
                 </AnimatedCard>
               )}
 
-              {activeTab === 'security' && (
+              {activeTab === "security" && (
                 <AnimatedCard delay={0.3} className="gradient-card">
                   <CardHeader>
                     <CardTitle className="flex items-center text-green-400">
@@ -654,28 +784,58 @@ export default function SettingsPage() {
                   <CardContent className="space-y-6">
                     <div className="space-y-4">
                       <div className="p-4 bg-gradient-to-r from-red-50 to-blue-50 rounded-lg">
-                        <h3 className="font-medium text-slate-900 mb-2">Change Password</h3>
-                        <p className="text-sm text-slate-300 mb-4">Update your account password</p>
-                        <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                          <Button variant="outline" className="border-red-300 text-red-600 hover:bg-red-50">
+                        <h3 className="font-medium text-slate-900 mb-2">
+                          Change Password
+                        </h3>
+                        <p className="text-sm text-slate-300 mb-4">
+                          Update your account password
+                        </p>
+                        <motion.div
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                        >
+                          <Button
+                            variant="outline"
+                            className="border-red-300 text-red-600 hover:bg-red-50"
+                          >
                             Change Password
                           </Button>
                         </motion.div>
                       </div>
                       <div className="p-4 bg-gradient-to-r from-red-50 to-blue-50 rounded-lg">
-                        <h3 className="font-medium text-slate-900 mb-2">Two-Factor Authentication</h3>
-                        <p className="text-sm text-slate-300 mb-4">Add an extra layer of security</p>
-                        <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                          <Button variant="outline" className="border-red-300 text-red-600 hover:bg-red-50">
+                        <h3 className="font-medium text-slate-900 mb-2">
+                          Two-Factor Authentication
+                        </h3>
+                        <p className="text-sm text-slate-300 mb-4">
+                          Add an extra layer of security
+                        </p>
+                        <motion.div
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                        >
+                          <Button
+                            variant="outline"
+                            className="border-red-300 text-red-600 hover:bg-red-50"
+                          >
                             Enable 2FA
                           </Button>
                         </motion.div>
                       </div>
                       <div className="p-4 bg-gradient-to-r from-red-50 to-blue-50 rounded-lg">
-                        <h3 className="font-medium text-slate-900 mb-2">Export Data</h3>
-                        <p className="text-sm text-slate-300 mb-4">Download your account data</p>
-                        <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                          <Button variant="outline" className="border-red-300 text-red-600 hover:bg-red-50">
+                        <h3 className="font-medium text-slate-900 mb-2">
+                          Export Data
+                        </h3>
+                        <p className="text-sm text-slate-300 mb-4">
+                          Download your account data
+                        </p>
+                        <motion.div
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                        >
+                          <Button
+                            variant="outline"
+                            className="border-red-300 text-red-600 hover:bg-red-50"
+                          >
                             <Download className="h-4 w-4 mr-2" />
                             Export Data
                           </Button>
@@ -693,7 +853,10 @@ export default function SettingsPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5 }}
               >
-                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
                   <Button
                     onClick={handleSaveSettings}
                     disabled={saving}

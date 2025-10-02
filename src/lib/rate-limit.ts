@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server';
+import { NextRequest } from "next/server";
 
 interface RateLimitStore {
   [key: string]: {
@@ -17,19 +17,20 @@ export interface RateLimitOptions {
 
 export function rateLimit(options: RateLimitOptions) {
   const { windowMs, maxAttempts, keyGenerator } = options;
-  
-  return (req: NextRequest): { success: boolean; remaining: number; resetTime: number } => {
+
+  return (
+    req: NextRequest
+  ): { success: boolean; remaining: number; resetTime: number } => {
     const key = keyGenerator ? keyGenerator(req) : getDefaultKey(req);
     const now = Date.now();
-    const windowStart = now - windowMs;
-    
+
     // Clean up expired entries
-    Object.keys(store).forEach(k => {
+    Object.keys(store).forEach((k) => {
       if (store[k].resetTime < now) {
         delete store[k];
       }
     });
-    
+
     // Get or create entry
     let entry = store[key];
     if (!entry || entry.resetTime < now) {
@@ -39,7 +40,7 @@ export function rateLimit(options: RateLimitOptions) {
       };
       store[key] = entry;
     }
-    
+
     // Check if limit exceeded
     if (entry.count >= maxAttempts) {
       return {
@@ -48,10 +49,10 @@ export function rateLimit(options: RateLimitOptions) {
         resetTime: entry.resetTime,
       };
     }
-    
+
     // Increment counter
     entry.count++;
-    
+
     return {
       success: true,
       remaining: maxAttempts - entry.count,
@@ -61,10 +62,11 @@ export function rateLimit(options: RateLimitOptions) {
 }
 
 function getDefaultKey(req: NextRequest): string {
-  const ip = req.headers.get('x-forwarded-for') || 
-             req.headers.get('x-real-ip') || 
-             'unknown';
-  const userAgent = req.headers.get('user-agent') || 'unknown';
+  const ip =
+    req.headers.get("x-forwarded-for") ||
+    req.headers.get("x-real-ip") ||
+    "unknown";
+  const userAgent = req.headers.get("user-agent") || "unknown";
   return `${ip}-${userAgent}`;
 }
 
@@ -76,15 +78,15 @@ export const loginRateLimit = rateLimit({
     // Handle both NextRequest and regular request objects
     const headers = req.headers || {};
     const getHeader = (name: string) => {
-      if (typeof headers.get === 'function') {
+      if (typeof headers.get === "function") {
         return headers.get(name);
       }
-      return headers[name] || headers[name.toLowerCase()];
+      const headersObj = headers as unknown as Record<string, string>;
+      return headersObj[name] || headersObj[name.toLowerCase()];
     };
-    
-    const ip = getHeader('x-forwarded-for') || 
-               getHeader('x-real-ip') || 
-               'unknown';
+
+    const ip =
+      getHeader("x-forwarded-for") || getHeader("x-real-ip") || "unknown";
     return `login-${ip}`;
   },
 });

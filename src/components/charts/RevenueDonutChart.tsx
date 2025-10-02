@@ -60,7 +60,13 @@ export default function RevenueDonutChart({
     fill: COLORS[index % COLORS.length],
   }));
 
-  const CustomTooltip = ({ active, payload }: any) => {
+  const CustomTooltip = ({
+    active,
+    payload,
+  }: {
+    active?: boolean;
+    payload?: Array<{ payload: { name: string; value: number } }>;
+  }) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
@@ -80,10 +86,13 @@ export default function RevenueDonutChart({
             Outstanding:{" "}
             <span className="font-semibold text-amber-600">
               $
-              {data.outstanding.toLocaleString("en-US", {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}
+              {(data as { outstanding?: number }).outstanding?.toLocaleString(
+                "en-US",
+                {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                }
+              ) || "0.00"}
             </span>
           </p>
         </div>
@@ -92,20 +101,26 @@ export default function RevenueDonutChart({
     return null;
   };
 
-  const CustomLegend = ({ payload }: any) => {
+  const CustomLegend = ({
+    payload,
+  }: {
+    payload?: Array<{ value: string; color: string }>;
+  }) => {
     return (
       <div className="flex flex-wrap gap-2 mt-4">
-        {payload.map((entry: any, index: number) => (
-          <div key={index} className="flex items-center space-x-2">
-            <div
-              className="w-3 h-3 rounded-full"
-              style={{ backgroundColor: entry.color }}
-            />
-            <span className="text-sm text-gray-600 dark:text-gray-300">
-              {entry.value}
-            </span>
-          </div>
-        ))}
+        {payload?.map(
+          (entry: { value: string; color: string }, index: number) => (
+            <div key={index} className="flex items-center space-x-2">
+              <div
+                className="w-3 h-3 rounded-full"
+                style={{ backgroundColor: entry.color }}
+              />
+              <span className="text-sm text-gray-600 dark:text-gray-300">
+                {entry.value}
+              </span>
+            </div>
+          )
+        )}
       </div>
     );
   };

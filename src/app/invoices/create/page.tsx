@@ -2,7 +2,7 @@
 
 import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, Suspense } from "react";
 import {
   Card,
   CardContent,
@@ -21,12 +21,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
 import { CustomerSearch } from "@/components/ui/customer-search";
 import { GradientTooltip } from "@/components/ui/gradient-tooltip";
 import {
   ArrowLeft,
-  Save,
   Plus,
   Trash2,
   Calculator,
@@ -37,10 +35,8 @@ import {
   Hash,
   Settings,
   Palette,
-  Layout,
   Sparkles,
   Briefcase,
-  Zap,
   Loader2,
   Search,
   X,
@@ -76,7 +72,7 @@ interface InvoiceItem {
   amount: number;
 }
 
-export default function CreateInvoicePage() {
+function CreateInvoicePageContent() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -125,7 +121,7 @@ export default function CreateInvoicePage() {
     "modern-blue": {
       gradient: "from-blue-500 to-cyan-500",
       name: "Modern Blue",
-      icon: Layout,
+      icon: "Layout",
       iconColor: "text-blue-400",
     },
     "classic-green": {
@@ -226,7 +222,7 @@ export default function CreateInvoicePage() {
       window.removeEventListener("storage", handleStorageChange);
       window.removeEventListener("focus", handleStorageChange);
     };
-  }, [selectedTemplate]);
+  }, [selectedTemplate, templateConfigs]);
 
   // Update due date when issue date changes
   useEffect(() => {
@@ -500,23 +496,30 @@ export default function CreateInvoicePage() {
     return `${symbol}${amount.toFixed(2)}`;
   };
 
-  const validateField = (field: string, value: any) => {
+  const validateField = (field: string, value: unknown) => {
     switch (field) {
       case "customerId":
         return !value ? "Please select a customer" : "";
       case "invoiceNumber":
         return !value ? "Invoice number is required" : "";
       case "items":
-        if (!value || value.length === 0) {
+        if (!value || (Array.isArray(value) && value.length === 0)) {
           return "Please add at least one invoice item";
         }
-        if (value.every((item: any) => !item.description.trim())) {
+        if (
+          Array.isArray(value) &&
+          value.every(
+            (item: { description: string }) => !item.description.trim()
+          )
+        ) {
           return "Please add descriptions to invoice items";
         }
         // Check for missing rates
-        const itemsWithoutRate = value.filter(
-          (item: any) => !item.rate || item.rate <= 0
-        );
+        const itemsWithoutRate = Array.isArray(value)
+          ? value.filter(
+              (item: { rate: number }) => !item.rate || item.rate <= 0
+            )
+          : [];
         if (itemsWithoutRate.length > 0) {
           return "Please enter a valid rate for all invoice items";
         }
@@ -552,7 +555,7 @@ export default function CreateInvoicePage() {
       const hasInvoiceNumberError = fieldErrors.invoiceNumber;
       const hasItemsError = fieldErrors.items;
 
-      let errorMessage = "Please fix the following issues:";
+      const errorMessage = "Please fix the following issues:";
       let errorDescription = "";
 
       if (hasCustomerError) {
@@ -616,11 +619,11 @@ export default function CreateInvoicePage() {
           result.error || result.message || "Failed to create invoice"
         );
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error creating invoice:", error);
       toast.error(
-        error.error ||
-          error.message ||
+        (error as { error?: string }).error ||
+          (error as { message?: string }).message ||
           "An error occurred while creating the invoice"
       );
     } finally {
@@ -1027,11 +1030,12 @@ export default function CreateInvoicePage() {
                     <div className="text-center py-8 text-slate-600">
                       <FileText className="h-12 w-12 mx-auto mb-4 text-slate-400" />
                       <p>
-                        No items added yet. Click "Add Item" to get started.
+                        No items added yet. Click &quot;Add Item&quot; to get
+                        started.
                       </p>
                     </div>
                   ) : (
-                    formData.items.map((item, index) => (
+                    formData.items.map((item) => (
                       <div key={item.id} className="p-4 border rounded-lg">
                         <div className="grid grid-cols-12 gap-4 items-end">
                           <div className="col-span-5 space-y-2">
@@ -1329,5 +1333,19 @@ export default function CreateInvoicePage() {
         </form>
       </div>
     </div>
+  );
+}
+
+export default function CreateInvoicePage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center min-h-screen">
+          <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+        </div>
+      }
+    >
+      <CreateInvoicePageContent />
+    </Suspense>
   );
 }

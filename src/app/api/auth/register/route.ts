@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
-import bcrypt from 'bcryptjs';
-import connectDB from '@/lib/db/connection';
-import User from '@/lib/db/models/User';
-import { validatePassword } from '@/lib/password-validation';
+import { NextRequest, NextResponse } from "next/server";
+import bcrypt from "bcryptjs";
+import connectDB from "@/lib/db/connection";
+import User from "@/lib/db/models/User";
+import { validatePassword } from "@/lib/password-validation";
 
 export async function POST(request: NextRequest) {
   try {
@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
     // Validate input
     if (!name || !email || !password) {
       return NextResponse.json(
-        { error: 'Name, email, and password are required' },
+        { error: "Name, email, and password are required" },
         { status: 400 }
       );
     }
@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       return NextResponse.json(
-        { error: 'Please enter a valid email address' },
+        { error: "Please enter a valid email address" },
         { status: 400 }
       );
     }
@@ -29,9 +29,9 @@ export async function POST(request: NextRequest) {
     const passwordValidation = validatePassword(password);
     if (!passwordValidation.isValid) {
       return NextResponse.json(
-        { 
-          error: 'Password does not meet requirements',
-          details: passwordValidation.errors
+        {
+          error: "Password does not meet requirements",
+          details: passwordValidation.errors,
         },
         { status: 400 }
       );
@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return NextResponse.json(
-        { error: 'User with this email already exists' },
+        { error: "User with this email already exists" },
         { status: 400 }
       );
     }
@@ -62,19 +62,20 @@ export async function POST(request: NextRequest) {
     await user.save();
 
     // Return success (don't include password)
-    const { password: _, ...userWithoutPassword } = user.toObject();
+    const userObj = user.toObject();
+    const { password: _, ...userWithoutPassword } = userObj;
 
     return NextResponse.json(
-      { 
-        message: 'User created successfully',
-        user: userWithoutPassword 
+      {
+        message: "User created successfully",
+        user: userWithoutPassword,
       },
       { status: 201 }
     );
   } catch (error) {
-    console.error('Registration error:', error);
+    console.error("Registration error:", error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: "Internal server error" },
       { status: 500 }
     );
   }

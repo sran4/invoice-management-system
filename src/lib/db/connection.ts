@@ -14,7 +14,12 @@ if (!MONGODB_URI) {
  * during API Route usage.
  */
 declare global {
-  var mongoose: any;
+  var mongoose:
+    | {
+        conn: typeof mongoose | null;
+        promise: Promise<typeof mongoose> | null;
+      }
+    | undefined;
 }
 
 let cached = global.mongoose;
@@ -23,12 +28,17 @@ if (!cached) {
   cached = global.mongoose = { conn: null, promise: null };
 }
 
+// Ensure cached is not undefined
+if (!cached) {
+  throw new Error("Failed to initialize mongoose cache");
+}
+
 async function connectDB() {
-  if (cached.conn) {
-    return cached.conn;
+  if (cached!.conn) {
+    return cached!.conn;
   }
 
-  if (!cached.promise) {
+  if (!cached!.promise) {
     const opts = {
       bufferCommands: false,
       maxPoolSize: 10, // Maintain up to 10 socket connections
@@ -38,19 +48,18 @@ async function connectDB() {
       maxIdleTimeMS: 30000, // Close connections after 30 seconds of inactivity
     };
 
-    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
-      return mongoose;
-    });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    cached!.promise = mongoose.connect(MONGODB_URI!, opts) as any;
   }
 
   try {
-    cached.conn = await cached.promise;
+    cached!.conn = await cached!.promise;
   } catch (e) {
-    cached.promise = null;
+    cached!.promise = null;
     throw e;
   }
 
-  return cached.conn;
+  return cached!.conn;
 }
 
 export default connectDB;

@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { AnimatedCard } from "@/components/ui/animated-card";
 import { motion } from "framer-motion";
 import {
@@ -139,8 +138,10 @@ export default function CustomersPage() {
       customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       customer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       customer.phone.includes(searchTerm) ||
-      (customer.companyName &&
-        customer.companyName.toLowerCase().includes(searchTerm.toLowerCase()))
+      ((customer as { companyName?: string }).companyName &&
+        (customer as { companyName?: string })
+          .companyName!.toLowerCase()
+          .includes(searchTerm.toLowerCase()))
   );
 
   // Pagination logic
@@ -288,9 +289,9 @@ export default function CustomersPage() {
                         <CardTitle className="text-lg">
                           {customer.name}
                         </CardTitle>
-                        {customer.companyName && (
+                        {(customer as { companyName?: string }).companyName && (
                           <p className="text-sm text-slate-600 mt-1">
-                            {customer.companyName}
+                            {(customer as { companyName?: string }).companyName}
                           </p>
                         )}
                         <CardDescription>

@@ -32,10 +32,12 @@ export async function GET() {
     response.headers.set("X-Content-Type-Options", "nosniff");
 
     return response;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching customers:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json(
-      { error: "Failed to fetch customers", details: error.message },
+      { error: "Failed to fetch customers", details: errorMessage },
       { status: 500 }
     );
   }
@@ -109,10 +111,12 @@ export async function POST(request: NextRequest) {
       },
       { status: 201 }
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error creating customer:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json(
-      { error: "Failed to create customer", details: error.message },
+      { error: "Failed to create customer", details: errorMessage },
       { status: 500 }
     );
   }

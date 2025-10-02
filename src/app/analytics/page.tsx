@@ -4,7 +4,6 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
-  Card,
   CardContent,
   CardDescription,
   CardHeader,
@@ -15,7 +14,6 @@ import { Badge } from "@/components/ui/badge";
 import { AnimatedCard } from "@/components/ui/animated-card";
 import { motion } from "framer-motion";
 import {
-  BarChart3,
   TrendingUp,
   Calendar,
   DollarSign,
@@ -76,6 +74,7 @@ interface AnalyticsData {
     customerName: string;
     revenue: number;
     totalShipped: number;
+    outstanding: number;
   }>;
   revenueByMonth: Array<{
     month: string;
@@ -486,7 +485,6 @@ export default function Analytics() {
                 <CardContent>
                   <RevenueDonutChart
                     data={analyticsData?.revenueByCustomer || []}
-                    totalRevenue={analyticsData?.totalRevenue || 0}
                   />
                 </CardContent>
               </AnimatedCard>

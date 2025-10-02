@@ -24,7 +24,7 @@ async function connectDB() {
     bufferCommands: false,
   };
 
-  return mongoose.connect(MONGODB_URI, opts);
+  return mongoose.connect(MONGODB_URI!, opts);
 }
 
 // Import models after environment variables are loaded

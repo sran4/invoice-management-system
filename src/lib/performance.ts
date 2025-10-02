@@ -1,9 +1,10 @@
 // Performance optimization utilities
+import React from "react";
 
 // Cache for API responses
 const apiCache = new Map<
   string,
-  { data: any; timestamp: number; ttl: number }
+  { data: unknown; timestamp: number; ttl: number }
 >();
 
 // Cache TTL in milliseconds
@@ -96,7 +97,7 @@ export async function cachedFetch<T>(
 /**
  * Debounce function to prevent excessive API calls
  */
-export function debounce<T extends (...args: any[]) => any>(
+export function debounce<T extends (...args: unknown[]) => unknown>(
   func: T,
   wait: number
 ): (...args: Parameters<T>) => void {
@@ -111,7 +112,7 @@ export function debounce<T extends (...args: any[]) => any>(
 /**
  * Throttle function to limit function execution frequency
  */
-export function throttle<T extends (...args: any[]) => any>(
+export function throttle<T extends (...args: unknown[]) => unknown>(
   func: T,
   limit: number
 ): (...args: Parameters<T>) => void {
@@ -175,11 +176,7 @@ export function prefersReducedMotion(): boolean {
 /**
  * Optimize images for better performance
  */
-export function optimizeImageUrl(
-  url: string,
-  width?: number,
-  height?: number
-): string {
+export function optimizeImageUrl(url: string): string {
   if (!url) return "";
 
   // For external images, you might want to use a service like Cloudinary
@@ -190,7 +187,7 @@ export function optimizeImageUrl(
 /**
  * Lazy load components
  */
-export function lazyLoadComponent<T extends React.ComponentType<any>>(
+export function lazyLoadComponent<T extends React.ComponentType<unknown>>(
   importFunc: () => Promise<{ default: T }>
 ): React.LazyExoticComponent<T> {
   return React.lazy(importFunc);

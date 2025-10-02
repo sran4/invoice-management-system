@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, ChevronUp } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ChevronDown } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface AccordionItemProps {
   question: string;
@@ -13,12 +13,12 @@ interface AccordionItemProps {
   className?: string;
 }
 
-export function AccordionItem({ 
-  question, 
-  answer, 
-  isOpen, 
-  onToggle, 
-  className 
+export function AccordionItem({
+  question,
+  answer,
+  isOpen,
+  onToggle,
+  className,
 }: AccordionItemProps) {
   return (
     <motion.div
@@ -44,14 +44,14 @@ export function AccordionItem({
           <ChevronDown className="h-5 w-5 text-gray-500 dark:text-gray-400 flex-shrink-0" />
         </motion.div>
       </button>
-      
+
       <AnimatePresence>
         {isOpen && (
           <motion.div
             initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
+            animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3, ease: 'easeInOut' }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
             className="overflow-hidden"
           >
             <div className="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
@@ -75,15 +75,15 @@ interface AccordionProps {
   allowMultiple?: boolean;
 }
 
-export function Accordion({ 
-  items, 
-  className, 
-  allowMultiple = false 
+export function Accordion({
+  items,
+  className,
+  allowMultiple = false,
 }: AccordionProps) {
   const [openItems, setOpenItems] = useState<Set<number>>(new Set());
 
   const toggleItem = (index: number) => {
-    setOpenItems(prev => {
+    setOpenItems((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(index)) {
         newSet.delete(index);

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { connectDB } from "@/lib/db/connection";
+import connectDB from "@/lib/db/connection";
 import User from "@/lib/db/models/User";
 import Customer from "@/lib/db/models/Customer";
 import Invoice from "@/lib/db/models/Invoice";
@@ -179,9 +179,9 @@ const sampleInvoiceItems = [
 const templates = ["modern", "classic", "minimal", "professional", "creative"];
 
 // Helper functions
-const getRandomItem = (array: any[]) =>
+const getRandomItem = <T>(array: T[]): T =>
   array[Math.floor(Math.random() * array.length)];
-const getRandomItems = (array: any[], count: number) => {
+const getRandomItems = <T>(array: T[], count: number): T[] => {
   const shuffled = [...array].sort(() => 0.5 - Math.random());
   return shuffled.slice(0, count);
 };
@@ -401,7 +401,7 @@ export async function POST(request: NextRequest) {
       const invoice = new Invoice({
         userId: user._id.toString(),
         invoiceNumber: generateInvoiceNumber(),
-        customerId: customer._id.toString(),
+        customerId: (customer._id as { toString(): string }).toString(),
         items,
         subtotal: Math.round(subtotal * 100) / 100,
         tax: Math.round(tax * 100) / 100,
@@ -421,7 +421,7 @@ export async function POST(request: NextRequest) {
     await Invoice.insertMany(invoices);
 
     // Return sample login credentials
-    const loginCredentials = users.map((user, index) => ({
+    const loginCredentials = users.map((user) => ({
       email: user.email,
       password: "password123",
     }));
