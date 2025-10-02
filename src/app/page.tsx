@@ -37,12 +37,6 @@ import { Accordion } from "@/components/ui/accordion";
 
 export default function Home() {
   
-  // Debug logging
-  console.log("=== SIMPLE HOME PAGE TEST ===");
-  console.log("Home page component is rendering!");
-  console.log("Current time:", new Date().toISOString());
-  console.log("Session status:", status);
-  console.log("=== END SIMPLE TEST ===");
   const [previewTemplate, setPreviewTemplate] = useState<{
     id: string;
     name: string;
@@ -51,16 +45,6 @@ export default function Home() {
     iconColor: string;
   } | null>(null);
 
-  // Temporarily disable all redirects for testing
-  // useEffect(() => {
-  //   if (status === "loading") return;
-  //   if (session) {
-  //     console.log("User is authenticated, redirecting to dashboard");
-  //     router.push("/dashboard");
-  //   } else {
-  //     console.log("User is not authenticated, staying on home page");
-  //   }
-  // }, [session, status, router]);
 
   const handlePreviewTemplate = (template: {
     id: string;
@@ -267,25 +251,9 @@ export default function Home() {
     },
   ];
 
-  // Temporarily disable loading state
-  // if (status === "loading") {
-  //   return (
-  //     <div className="min-h-screen flex items-center justify-center">
-  //       <div className="text-center">
-  //         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary mx-auto mb-4"></div>
-  //         <p className="text-gray-600 dark:text-gray-300">Loading session...</p>
-  //         <p className="text-sm text-gray-500 mt-2">Debug: Checking authentication status</p>
-  //       </div>
-  //     </div>
-  //   );
-  // }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-gray-900 dark:via-slate-800 dark:to-gray-700">
-      {/* Debug Banner */}
-      <div className="bg-green-500 text-white p-2 text-center text-sm">
-        SIMPLE TEST: Home page is working! No session, no redirects.
-      </div>
       {/* Hero Section */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-red-500/10 via-blue-500/10 to-purple-500/10 dark:from-red-500/20 dark:via-blue-500/20 dark:to-purple-500/20"></div>
