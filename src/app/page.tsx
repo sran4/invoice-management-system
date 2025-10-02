@@ -38,15 +38,16 @@ import {
 import { Accordion } from "@/components/ui/accordion";
 
 export default function Home() {
-  // Temporarily disable session to test if that's causing the redirect
-  // const { data: session, status } = useSession();
-  // const router = useRouter();
+  const { data: session, status } = useSession();
+  const router = useRouter();
   
   // Debug logging - Updated for production debugging
   console.log("=== HOME PAGE DEBUG ===");
-  console.log("Home page - Session temporarily disabled for testing");
+  console.log("Home page - Session status:", status);
+  console.log("Home page - Session data:", session);
   console.log("Home page - Current URL:", typeof window !== 'undefined' ? window.location.href : 'SSR');
   console.log("Home page - Environment:", process.env.NODE_ENV);
+  console.log("Home page - NextAuth URL:", process.env.NEXTAUTH_URL);
   console.log("Home page - Component rendered at:", new Date().toISOString());
   console.log("=== END DEBUG ===");
   const [previewTemplate, setPreviewTemplate] = useState<{
@@ -57,13 +58,16 @@ export default function Home() {
     iconColor: string;
   } | null>(null);
 
-  // Temporarily disabled auto-redirect to debug login issue
-  // useEffect(() => {
-  //   if (status === "loading") return;
-  //   if (session) {
-  //     router.push("/dashboard");
-  //   }
-  // }, [session, status, router]);
+  // Auto-redirect authenticated users to dashboard
+  useEffect(() => {
+    if (status === "loading") return;
+    if (session) {
+      console.log("User is authenticated, redirecting to dashboard");
+      router.push("/dashboard");
+    } else {
+      console.log("User is not authenticated, staying on home page");
+    }
+  }, [session, status, router]);
 
   const handlePreviewTemplate = (template: {
     id: string;
@@ -270,24 +274,23 @@ export default function Home() {
     },
   ];
 
-  // Temporarily disable loading state
-  // if (status === "loading") {
-  //   return (
-  //     <div className="min-h-screen flex items-center justify-center">
-  //       <div className="text-center">
-  //         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary mx-auto mb-4"></div>
-  //         <p className="text-gray-600 dark:text-gray-300">Loading session...</p>
-  //         <p className="text-sm text-gray-500 mt-2">Debug: Status is loading - Updated</p>
-  //       </div>
-  //     </div>
-  //   );
-  // }
+  if (status === "loading") {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-300">Loading session...</p>
+          <p className="text-sm text-gray-500 mt-2">Debug: Checking authentication status</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-gray-900 dark:via-slate-800 dark:to-gray-700">
       {/* Debug Banner */}
       <div className="bg-red-500 text-white p-2 text-center text-sm">
-        DEBUG: Home page is loading! Session temporarily disabled for testing
+        DEBUG: Home page loaded! Session status: {status} | User: {session ? session.user?.email : 'Not logged in'}
       </div>
       {/* Hero Section */}
       <div className="relative overflow-hidden">
