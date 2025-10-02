@@ -42,11 +42,14 @@ export default function Home() {
   const router = useRouter();
   
   // Debug logging - Updated for production debugging
+  console.log("=== HOME PAGE DEBUG ===");
   console.log("Home page - Session status:", status);
   console.log("Home page - Session data:", session);
   console.log("Home page - Current URL:", typeof window !== 'undefined' ? window.location.href : 'SSR');
   console.log("Home page - Environment:", process.env.NODE_ENV);
   console.log("Home page - NextAuth URL:", process.env.NEXTAUTH_URL);
+  console.log("Home page - Component rendered at:", new Date().toISOString());
+  console.log("=== END DEBUG ===");
   const [previewTemplate, setPreviewTemplate] = useState<{
     id: string;
     name: string;
@@ -282,6 +285,10 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-gray-900 dark:via-slate-800 dark:to-gray-700">
+      {/* Debug Banner */}
+      <div className="bg-red-500 text-white p-2 text-center text-sm">
+        DEBUG: Home page is loading! Session status: {status}
+      </div>
       {/* Hero Section */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-red-500/10 via-blue-500/10 to-purple-500/10 dark:from-red-500/20 dark:via-blue-500/20 dark:to-purple-500/20"></div>
