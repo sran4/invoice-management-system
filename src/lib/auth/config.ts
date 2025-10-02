@@ -287,5 +287,9 @@ export const authOptions: NextAuthOptions = {
         }
       }
     },
+    async signOut({ token }) {
+      // Clear any server-side session data if needed
+      console.log("User signed out:", token?.email);
+    },
   },
 };

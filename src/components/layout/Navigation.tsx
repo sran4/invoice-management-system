@@ -246,7 +246,10 @@ export default function Navigation() {
                     <DropdownMenuSeparator className="bg-gray-200 dark:bg-gray-600" />
                     <DropdownMenuItem
                       className="cursor-pointer text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300"
-                      onClick={() => signOut()}
+                      onClick={() => signOut({ 
+                        callbackUrl: '/',
+                        redirect: true 
+                      })}
                       title="Sign out"
                     >
                       <LogOut className="mr-2 h-4 w-4" />
@@ -483,7 +486,10 @@ export default function Navigation() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => signOut()}
+                        onClick={() => signOut({ 
+                          callbackUrl: '/',
+                          redirect: true 
+                        })}
                         className="text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all duration-300 cursor-pointer"
                         title="Sign out"
                       >
