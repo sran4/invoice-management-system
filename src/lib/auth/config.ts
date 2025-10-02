@@ -261,6 +261,14 @@ export const authOptions: NextAuthOptions = {
       // For credentials provider, the authorize function handles validation
       return true;
     },
+    async redirect({ url, baseUrl }) {
+      // Allow relative URLs
+      if (url.startsWith("/")) return `${baseUrl}${url}`;
+      // Allow same origin URLs
+      else if (new URL(url).origin === baseUrl) return url;
+      // Default to home page instead of dashboard
+      return baseUrl;
+    },
   },
   pages: {
     signIn: "/auth/signin",
