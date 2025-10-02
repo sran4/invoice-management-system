@@ -41,9 +41,10 @@ export default function Home() {
   const { data: session, status } = useSession();
   const router = useRouter();
   
-  // Debug logging
+  // Debug logging - Updated for production debugging
   console.log("Home page - Session status:", status);
   console.log("Home page - Session data:", session);
+  console.log("Home page - Current URL:", window.location.href);
   const [previewTemplate, setPreviewTemplate] = useState<{
     id: string;
     name: string;
