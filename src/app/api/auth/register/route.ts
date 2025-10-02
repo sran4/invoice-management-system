@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
 
     await user.save();
 
-    // Return success (don't include password)
+    // Return success (don't include password) - Fixed variable conflict
     const userObj = user.toObject();
     const { password: _, ...userWithoutPassword } = userObj;
 
