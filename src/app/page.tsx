@@ -1,9 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   CardContent,
@@ -38,8 +36,6 @@ import {
 import { Accordion } from "@/components/ui/accordion";
 
 export default function Home() {
-  const { data: session, status } = useSession();
-  const router = useRouter();
   
   // Debug logging
   console.log("=== SIMPLE HOME PAGE TEST ===");

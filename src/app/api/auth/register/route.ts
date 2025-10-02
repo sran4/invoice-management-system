@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
 
     // Return success (don't include password)
     const userObj = user.toObject();
-    const { password: _, ...userWithoutPassword } = userObj;
+    const { password, ...userWithoutPassword } = userObj;
 
     return NextResponse.json(
       {
