@@ -653,7 +653,7 @@ export default function Home() {
                     className="gradient-button text-white border-0 pulse-glow"
                     onClick={() => {
                       setPreviewTemplate(null);
-                      router.push("/templates");
+                      alert("Templates page would open here");
                     }}
                   >
                     <CheckCircle className="w-4 h-4 mr-2" />
