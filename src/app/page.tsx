@@ -38,10 +38,14 @@ import {
 import { Accordion } from "@/components/ui/accordion";
 
 export default function Home() {
-  // Super simple test - no session, no complex logic
+  const { data: session, status } = useSession();
+  const router = useRouter();
+  
+  // Debug logging
   console.log("=== SIMPLE HOME PAGE TEST ===");
   console.log("Home page component is rendering!");
   console.log("Current time:", new Date().toISOString());
+  console.log("Session status:", status);
   console.log("=== END SIMPLE TEST ===");
   const [previewTemplate, setPreviewTemplate] = useState<{
     id: string;
