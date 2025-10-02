@@ -44,7 +44,9 @@ export default function Home() {
   // Debug logging - Updated for production debugging
   console.log("Home page - Session status:", status);
   console.log("Home page - Session data:", session);
-  console.log("Home page - Current URL:", window.location.href);
+  console.log("Home page - Current URL:", typeof window !== 'undefined' ? window.location.href : 'SSR');
+  console.log("Home page - Environment:", process.env.NODE_ENV);
+  console.log("Home page - NextAuth URL:", process.env.NEXTAUTH_URL);
   const [previewTemplate, setPreviewTemplate] = useState<{
     id: string;
     name: string;
@@ -269,7 +271,11 @@ export default function Home() {
   if (status === "loading") {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-300">Loading session...</p>
+          <p className="text-sm text-gray-500 mt-2">Debug: Status is loading</p>
+        </div>
       </div>
     );
   }
